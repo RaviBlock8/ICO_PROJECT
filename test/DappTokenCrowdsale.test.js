@@ -1,6 +1,7 @@
 const DappToken=artifacts.require('DappToken');
 const DappTokenCrowdSale=artifacts.require('DappTokenCrowdSale');
 const BN =require('bn.js')
+
 // const ether=require('./helpers/ether')
 
 require('chai')
@@ -15,7 +16,8 @@ contract('DappTokenCrowdsale',([_,wallet,investor1,investor2])=>{
         this.token=await DappToken.new(_name,_symbol,_decimals);
         this.rate=500
         this.wallet=wallet
-        this.crowd=await DappTokenCrowdSale.new(this.rate,this.wallet,this.token.address)
+        this.cap=20000
+        this.crowd=await DappTokenCrowdSale.new(this.rate,this.wallet,this.token.address,new BN(this.cap,2))
         await this.token.addMinter(this.crowd.address)
         // console.log('ownerhsip transfered')
 
@@ -42,7 +44,14 @@ contract('DappTokenCrowdsale',([_,wallet,investor1,investor2])=>{
     describe("accepting payments",()=>{
             it("should accept payments",async ()=>{
             // let _value=ether(1);
-            await this.crowd.sendTransaction({value:'100000000',from:investor1}).should.be.fulfilled
+            await this.crowd.sendTransaction({value:'100',from:investor1}).should.be.fulfilled
+        })
+    })
+
+    describe("check crowdsale function",()=>{
+        it("check cap value",async ()=>{
+            let _cap=await this.crowd.cap()
+            _cap.should.equal(this.cap)
         })
     })
 

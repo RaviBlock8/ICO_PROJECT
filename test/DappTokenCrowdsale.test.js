@@ -1,10 +1,13 @@
 const DappToken=artifacts.require('DappToken');
 const DappTokenCrowdSale=artifacts.require('DappTokenCrowdSale');
+const BN =require('bn.js')
+// const ether=require('./helpers/ether')
 
 require('chai')
+.use(require('chai-as-promised'))
 .should()
 
-contract('DappTokenCrowdsale',([_,wallet])=>{
+contract('DappTokenCrowdsale',([_,wallet,investor1,investor2])=>{
     beforeEach(async()=>{
         const _name='Dapp token'
         const _symbol='DAPP'
@@ -13,6 +16,8 @@ contract('DappTokenCrowdsale',([_,wallet])=>{
         this.rate=500
         this.wallet=wallet
         this.crowd=await DappTokenCrowdSale.new(this.rate,this.wallet,this.token.address)
+        await this.token.addMinter(this.crowd.address)
+        // console.log('ownerhsip transfered')
 
     })
     describe('crowdsale',()=>{
@@ -32,6 +37,13 @@ contract('DappTokenCrowdsale',([_,wallet])=>{
         })
 
         
+    })
+
+    describe("accepting payments",()=>{
+            it("should accept payments",async ()=>{
+            // let _value=ether(1);
+            await this.crowd.sendTransaction({value:'100000000',from:investor1}).should.be.fulfilled
+        })
     })
 
 
